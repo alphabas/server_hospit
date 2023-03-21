@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcrypt");
 const User = mongoose.model("Users");
 const jwt = require("jsonwebtoken");
 
@@ -41,4 +41,25 @@ router.post("/signup", (req, res) => {
   });
 });
 
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).json({ error: "Please add email or password" });
+  }
+  const savedUser = await User.findOne({ email: email });
+
+  if (!savedUser) {
+    return res.status(422).json({ error: "Invalid credentials" });
+  }
+
+  try {
+    bcrypt.compare(password, savedUser.password, (err, result) => {
+      if (result) {
+      } else {
+        console.log("Password does not match", savedUser);
+        return res.status(422).json({ err: "Invalid credential" });
+      }
+    });
+  } catch (err) {}
+});
 module.exports = router;

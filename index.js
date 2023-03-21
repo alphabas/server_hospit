@@ -7,11 +7,13 @@ require("./db");
 require("./models/Users");
 
 const authRouter = require("./routes/authRoutes");
+const requireToken = require("./middlewares/AuthTokenRequired");
 
 app.use(bodyParser.json());
 app.use(authRouter);
 
-app.get("/", (req, res) => {
+app.get("/", requireToken, (req, res) => {
+  res.send(`your email: ${req.user.email} `);
   res.send("This is home page");
 });
 
